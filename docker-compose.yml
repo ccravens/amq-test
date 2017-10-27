@@ -1,0 +1,29 @@
+version: "3"
+services:
+
+    activemq:
+        image: webcenter/activemq:5.14.3
+        expose:
+            - "5672"
+
+    load-test-listener:
+        build: ./amqp-load-tester
+        depends_on:
+            - activemq
+        environment:
+            - "TEST_ROLE=consumer"
+            - "AMQP_SERVER=activemq:5672"
+            - "AMQP_ADDRESS=examples"
+
+
+    load-test-publisher:
+        build: ./amqp-load-tester
+        depends_on:
+            - activemq
+        environment:
+            - "TEST_ROLE=publisher"
+            - "AMQP_SERVER=activemq:5672"
+            - "AMQP_ADDRESS=examples"
+            - "RECURRING_PUBLISHER_PERIOD=1.0"
+            - "RECURRING_PUBLISHER_MIN_MSG_LEN=100"
+            - "RECURRING_PUBLISHER_MAX_MSG_LEN=1000"
